@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Онлайн Каталог – Филми и Игри</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== ХЕДЪР ===== -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🎬</span>
+        <div>
+          <h1>FilmGame <span>Каталог</span></h1>
+          <p class="tagline">Намери любимия си филм или игра</p>
+        </div>
+      </div>
+      <nav>
+        <a href="#" class="nav-link active" onclick="showTab('all')">Всички</a>
+        <a href="#" class="nav-link" onclick="showTab('movies')">🎬 Филми</a>
+        <a href="#" class="nav-link" onclick="showTab('games')">🎮 Игри</a>
+        <a href="#" class="nav-link" onclick="showTab('add')">➕ Добави</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== ГЛАВНА СЕКЦИЯ ===== -->
+  <main>
+
+    <!-- Лента за търсене и филтриране -->
+    <section class="search-bar">
+      <div class="search-group">
+        <label for="searchInput">🔍 Търсене:</label>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Въведи заглавие..."
+          oninput="filterItems()"
+        />
+      </div>
+      <div class="search-group">
+        <label for="genreFilter">Жанр:</label>
+        <select id="genreFilter" onchange="filterItems()">
+          <option value="">-- Всички жанрове --</option>
+          <option value="Екшън">Екшън</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Драма">Драма</option>
+          <option value="Трилър">Трилър</option>
+          <option value="RPG">RPG</option>
+          <option value="Стратегия">Стратегия</option>
+          <option value="Приключение">Приключение</option>
+        </select>
+      </div>
+      <div class="search-group">
+        <label for="ratingFilter">Мин. оценка:</label>
+        <select id="ratingFilter" onchange="filterItems()">
+          <option value="0">Всички</option>
+          <option value="7">7+</option>
+          <option value="8">8+</option>
+          <option value="9">9+</option>
+        </select>
+      </div>
+      <button class="btn-reset" onclick="resetFilters()">✖ Изчисти</button>
+    </section>
+
+    <!-- Резултат брой -->
+    <div class="results-info">
+      Намерени: <strong id="resultCount">0</strong> резултата
+    </div>
+
+    <!-- ===== ТАБОВЕ ===== -->
+    <div id="tab-all">
+      <h2 class="section-title">🌟 Всички</h2>
+      <div class="grid" id="grid-all"></div>
+    </div>
+
+    <div id="tab-movies" class="hidden">
+      <h2 class="section-title">🎬 Филми</h2>
+      <div class="grid" id="grid-movies"></div>
+    </div>
+
+    <div id="tab-games" class="hidden">
+      <h2 class="section-title">🎮 Игри</h2>
+      <div class="grid" id="grid-games"></div>
+    </div>
+
+    <!-- ===== ФОРМА ЗА ДОБАВЯНЕ ===== -->
+    <div id="tab-add" class="hidden">
+      <h2 class="section-title">➕ Добави нов запис</h2>
+      <form class="add-form" onsubmit="addItem(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newType">Тип: *</label>
+            <select id="newType" required>
+              <option value="">-- Избери --</option>
+              <option value="movie">🎬 Филм</option>
+              <option value="game">🎮 Игра</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newTitle">Заглавие: *</label>
+            <input type="text" id="newTitle" placeholder="Напр. The Matrix" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newYear">Година: *</label>
+            <input type="number" id="newYear" min="1900" max="2030" placeholder="2024" required />
+          </div>
+          <div class="form-group">
+            <label for="newGenre">Жанр: *</label>
+            <select id="newGenre" required>
+              <option value="">-- Избери --</option>
+              <option value="Екшън">Екшън</option>
+              <option value="Sci-Fi">Sci-Fi</option>
+              <option value="Драма">Драма</option>
+              <option value="Трилър">Трилър</option>
+              <option value="RPG">RPG</option>
+              <option value="Стратегия">Стратегия</option>
+              <option value="Приключение">Приключение</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newRating">Оценка (1-10): *</label>
+            <input type="number" id="newRating" min="1" max="10" step="0.1" placeholder="8.5" required />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="newDesc">Описание:</label>
+          <textarea id="newDesc" rows="3" placeholder="Кратко описание..."></textarea>
+        </div>
+
+        <!-- Полета само за филми -->
+        <div id="movie-fields" class="hidden form-row">
+          <div class="form-group">
+            <label for="newDirector">Режисьор:</label>
+            <input type="text" id="newDirector" placeholder="Напр. Christopher Nolan" />
+          </div>
+          <div class="form-group">
+            <label for="newDuration">Продължителност (мин):</label>
+            <input type="number" id="newDuration" placeholder="120" />
+          </div>
+        </div>
+
+        <!-- Полета само за игри -->
+        <div id="game-fields" class="hidden form-row">
+          <div class="form-group">
+            <label for="newDeveloper">Разработчик:</label>
+            <input type="text" id="newDeveloper" placeholder="Напр. CD Projekt Red" />
+          </div>
+          <div class="form-group">
+            <label for="newPlatform">Платформа:</label>
+            <input type="text" id="newPlatform" placeholder="Напр. PC / PS5" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">💾 Запази</button>
+          <button type="button" class="btn-secondary" onclick="showTab('all')">✖ Отказ</button>
+        </div>
+      </form>
+    </div>
+
+  </main>
+
+  <!-- ===== МОДАЛЕН ПРОЗОРЕЦ ===== -->
+  <div id="modal-bg" class="modal-bg hidden" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModalBtn()">✖</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ===== ФОТЪР ===== -->
+  <footer>
+    <p>Ученически проект | FilmGame Каталог | 11 клас, Информатика</p>
+    <p class="footer-tech">Java REST API · C++ Search Engine · MySQL · HTML/CSS</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
